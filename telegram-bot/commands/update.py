@@ -9,14 +9,17 @@ and rebooting — this handler just launches it as a detached background
 process so the bot can reply immediately instead of hanging until the
 whole update (and reboot) finishes.
 """
+import os
 import subprocess
 import time
 
 COMMAND = "update"
 DESCRIPTION = "Run system + Pi-hole update, then reboot (needs confirmation)"
 
-# Point this at wherever the script actually lives on your Pi.
-SCRIPT_PATH = "/home/robert/scripts/auto_update.sh"
+# Lives alongside the bot, in telegram-bot/scripts/.
+SCRIPT_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "auto_update.sh"
+)
 
 CONFIRM_WINDOW_SECONDS = 60
 _pending = {}  # chat_id -> timestamp of the unconfirmed /update request

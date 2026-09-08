@@ -1,0 +1,14 @@
+[Unit]
+Description=SSH login watcher -> Telegram alerts
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=robert
+ExecStart=/home/robert/telegram-bot/scripts/login_checker.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+[Unit]
+Description=Personal Telegram command bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=robert
+WorkingDirectory=/home/robert/telegram-bot
+ExecStart=/home/robert/telegram-bot/venv/bin/python /home/robert/telegram-bot/bot.py
+EnvironmentFile=/home/robert/telegram-bot/.env
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -3,45 +3,46 @@
 # These rules exist so a stray `git add -A` cannot pull them in.
 # ---------------------------------------------------------------------------
 
-# WireGuard / PiVPN client profiles and backups
-*.conf
-!*.example.conf
-configs/
-pivpnbackup/
-*.tgz
-
-# Telegram bot credentials
+# Telegram bot credentials (BOT_TOKEN, ALLOWED_CHAT_ID)
+.env
 tg_token
 .config/tg_token
 
-# Cloudflare tunnel credentials (the credentials-file is <TUNNEL-ID>.json).
-# Scoped to the directory rather than a blanket *.json, so ordinary config
-# files can still be committed.
-.cloudflared/
-*-*-*-*-*.json
+# copyparty: password/filekey hashing salts and live login sessions.
+# Anyone with the salts can attack the account hashes offline; anyone with
+# sessions.db can resume a logged-in session. copyparty.conf itself is fine
+# to track as long as no `pw:` lines are added to it.
+.config/copyparty/*-salt.txt
+.config/copyparty/iphash
+.config/copyparty/sessions.db*
 
-# Keys of any kind
+# transmission: settings.json holds the salted rpc-password hash, and the
+# daemon rewrites the whole file on shutdown -- so it cannot be scrubbed in
+# place. Track settings.example.json instead.
+.config/transmission-daemon/settings.json
+.config/transmission-daemon/settingsold.json
+.config/transmission-daemon/stats.json
+.config/transmission-daemon/dht.dat
+.config/transmission-daemon/*.bak-*
+
+# Keys and certificates of any kind
 *.key
 *.pem
+*.crt
 id_*
 !id_*.pub
 authorized_keys
 known_hosts*
 
 # ---------------------------------------------------------------------------
-# Bulk data -- keep the scripts and the playlist definitions, not the audio
+# Churn -- rebuildable, or machine state that changes every boot
 # ---------------------------------------------------------------------------
-Music/**/*.mp3
-Music/**/*.m4a
-Music/**/*.flac
-Music/**/*.opus
-failed_tracks.txt
-
-# ---------------------------------------------------------------------------
-# Churn
-# ---------------------------------------------------------------------------
+venv/
 .venv/
 __pycache__/
+*.pyc
 *.log
 .bash_history
 .zsh_history
+.lesshst
+.viminfo

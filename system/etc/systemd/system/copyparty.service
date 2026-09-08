@@ -1,0 +1,14 @@
+[Unit]
+Description=Copyparty file server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=robert
+ExecStart=/home/robert/.local/bin/copyparty -c /home/robert/.config/copyparty/copyparty.conf
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
