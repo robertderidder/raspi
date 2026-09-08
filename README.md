@@ -44,7 +44,7 @@ the SD card is not worn out by log writes.
 | **copyparty** | `127.0.0.1:3923` | File browser and music/video streaming over HTTP. Serves `~/copyparty`. |
 | **transmission-daemon** | `127.0.0.1:9091` | Torrents, downloading straight into `~/copyparty/torrents` so copyparty picks them up. |
 | **telegram-bot** | — | Long-polls Telegram. The way the Pi is queried and controlled day to day. |
-| **login-checker** | — | Tails `journalctl -u ssh`, alerts to Telegram on every login attempt. |
+| **login-checker** | — | Telegram alert on every login. Watches **both** `ssh.service` and `tailscaled.service` — see below. |
 | **raspotify** | — | Spotify Connect endpoint, playing through the WM8960 audio HAT. |
 | **tailscaled** | — | Mesh VPN. The only way in. |
 
@@ -125,7 +125,7 @@ are long-lived services.
 | Unit | Scope | What it does |
 |---|---|---|
 | `telegram-bot.service` | system | The bot. `Restart=on-failure`. |
-| `login-checker.service` | system | SSH login alerts. Follows the journal forever. |
+| `login-checker.service` | system | Telegram alert per login, from `journalctl -u ssh -u tailscaled`. Follows the journal forever. |
 | `copyparty.service` | system | `copyparty -c ~/.config/copyparty/copyparty.conf`. |
 | `transmission-daemon.service` | system | Debian's unit, with a drop-in override forcing `User=robert` so downloads land in `~/copyparty/torrents` with usable permissions. |
 | `tailscale.service` | **user** | Taildrop auto-receive: `tailscale file get --wait --loop` into `~/copyparty/tailscale`. Files sent from a phone appear in copyparty. |
@@ -133,6 +133,36 @@ are long-lived services.
 > The user service needs `loginctl enable-linger robert` to run without an
 > active login session. That is already set — if user services mysteriously stop
 > surviving reboots, check it first.
+
+### Tailscale SSH bypasses sshd
+
+There are two independent ways in, and they log to different units:
+
+| Path | Handled by | Logs to |
+|---|---|---|
+| Port 22 direct — LAN, or a tailnet client not using Tailscale SSH | `sshd` | `ssh.service` |
+| Tailscale SSH (`tailscale set --ssh`) | `tailscaled` | `tailscaled.service` |
+
+With `--ssh` on, tailscaled intercepts port 22 on the tailnet address and runs
+the session itself. **sshd never sees the connection and logs nothing.**
+
+`login_checker.sh` originally tailed only `journalctl -u ssh`, so the day
+`--ssh` was turned on the alerting went silent — no error, no failed unit, no
+clue in the logs, just a watcher faithfully tailing a unit that had stopped
+receiving events. It now follows both units and says which path was used.
+
+If alerts stop again, confirm the journal is still producing login lines before
+suspecting the bot or the token:
+
+```bash
+sudo tailscale debug prefs | grep -i RunSSH      # is Tailscale SSH on?
+journalctl -u ssh -u tailscaled -f | grep -E "ssh-session|Accepted"
+tail -f ~/telegram-bot/scripts/logs/login_checker.log
+```
+
+Tailscale SSH is gated by the tailnet ACL rather than by `authorized_keys`, so
+who may log in is decided in the Tailscale admin console. An `access granted`
+line means the ACL allowed it.
 
 ### Cron
 
