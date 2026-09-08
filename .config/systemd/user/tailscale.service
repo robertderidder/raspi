@@ -1,0 +1,13 @@
+[Unit]
+Description=Tailscale Taildrop auto-receive
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/tailscale file get --wait --loop --conflict=rename %h/copyparty/tailscale
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

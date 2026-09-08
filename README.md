@@ -231,3 +231,6 @@ before the first real commit.
 - Navidrome — https://www.navidrome.org/docs/installation/linux/
 - Raspotify — https://dtcooper.github.io/raspotify/ (Spotify Connect endpoint, pairs
   well with an audio HAT)
+
+- other: copyparty installed via pipx
+- install audio hat by git cloning: git clone https://github.com/waveshare/WM8960-Audio-HAT

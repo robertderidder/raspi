@@ -1,0 +1,6 @@
+alias e='exit'
+alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ll='ls -lah'
+alias hg='history | grep'
