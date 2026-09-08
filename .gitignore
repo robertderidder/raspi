@@ -1,0 +1,47 @@
+# ---------------------------------------------------------------------------
+# Secrets. See the "Secrets" section in README.md.
+# These rules exist so a stray `git add -A` cannot pull them in.
+# ---------------------------------------------------------------------------
+
+# WireGuard / PiVPN client profiles and backups
+*.conf
+!*.example.conf
+configs/
+pivpnbackup/
+*.tgz
+
+# Telegram bot credentials
+tg_token
+.config/tg_token
+
+# Cloudflare tunnel credentials (the credentials-file is <TUNNEL-ID>.json).
+# Scoped to the directory rather than a blanket *.json, so ordinary config
+# files can still be committed.
+.cloudflared/
+*-*-*-*-*.json
+
+# Keys of any kind
+*.key
+*.pem
+id_*
+!id_*.pub
+authorized_keys
+known_hosts*
+
+# ---------------------------------------------------------------------------
+# Bulk data -- keep the scripts and the playlist definitions, not the audio
+# ---------------------------------------------------------------------------
+Music/**/*.mp3
+Music/**/*.m4a
+Music/**/*.flac
+Music/**/*.opus
+failed_tracks.txt
+
+# ---------------------------------------------------------------------------
+# Churn
+# ---------------------------------------------------------------------------
+.venv/
+__pycache__/
+*.log
+.bash_history
+.zsh_history
