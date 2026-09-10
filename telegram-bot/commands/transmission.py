@@ -19,6 +19,7 @@ import subprocess
 
 COMMAND = "transmission"
 DESCRIPTION = "Show transmission-daemon torrent progress"
+MIN_ROLE = "guest"
 
 STATUS_ICONS = {
     "Downloading": "⬇️",

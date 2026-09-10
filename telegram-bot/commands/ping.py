@@ -3,6 +3,7 @@ import subprocess
 
 COMMAND = "ping"
 DESCRIPTION = "Check the bot and Pi are alive"
+MIN_ROLE = "guest"
 
 
 async def handler(update, context):

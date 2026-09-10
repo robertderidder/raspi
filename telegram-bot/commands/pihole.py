@@ -4,6 +4,7 @@ import subprocess
 
 COMMAND = "pihole"
 DESCRIPTION = "Pi-hole stats & system health (last 24h)"
+MIN_ROLE = "guest"
 
 SCRIPT_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "..", "scripts", "pihole_report.sh"

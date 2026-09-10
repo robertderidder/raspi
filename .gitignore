@@ -7,6 +7,11 @@
 .env
 tokens.py
 
+# Who the bot has granted access to, written by /access at runtime. Chat ids
+# are not credentials, but a leaked token plus a known id is a way in -- and
+# the roommate's id is not ours to publish either way.
+telegram-bot/allowed_chats.json
+
 # copyparty: password/filekey hashing salts and live login sessions.
 # Anyone with the salts can attack the account hashes offline; anyone with
 # sessions.db can resume a logged-in session. copyparty.conf itself is fine

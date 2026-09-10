@@ -76,13 +76,17 @@ units that run them, and the commands that trigger them on demand.
 ```
 telegram-bot/
   bot.py                    long-polls Telegram, auto-discovers commands/
+  permissions.py            roles, grants, allowed_chats.json
+  access_requests.py        approve/block a stranger from a button
   .env                      BOT_TOKEN + ALLOWED_CHAT_ID  (never committed)
+  allowed_chats.json        everyone but you              (never committed)
   commands/
     ping.py                 /ping         liveness + uptime
     pihole.py               /pihole       24h stats + CPU temp, disk, RAM
     pihole_pause.py         /pause 10m    pause blocking, self-expiring
     transmission.py         /transmission torrent progress
-    update.py               /update       system update + reboot, needs confirm
+    update.py               /update       system update + reboot, confirm button
+    access.py               /access       manage who can run what
   scripts/
     pihole_report.sh        the report /pihole formats and sends
     login_checker.sh        long-lived SSH watcher (login-checker.service)
@@ -106,9 +110,15 @@ sudo systemctl restart telegram-bot     # picks up the new command
 journalctl -u telegram-bot -f
 ```
 
-Every handler is wrapped so the bot **only ever replies to `ALLOWED_CHAT_ID`**.
-Anyone else is ignored silently. That whitelist is what limits the damage if the
-token leaks.
+Every handler is wrapped in a permission check, and `ALLOWED_CHAT_ID` is the
+**owner** — the top of four roles (`blocked < guest < admin < owner`). Anyone
+else is a stranger until you approve them from a button, and can then be given
+as much or as little as you like, down to individual commands. That check is
+what limits the damage if the token leaks.
+
+The owner id is read from `.env` and never stored anywhere else, so no amount of
+bad state in `allowed_chats.json` can lock you out or promote anyone above you.
+See `telegram-bot/README.md` for the full model.
 
 The two shell scripts read `BOT_TOKEN` from the bot's `.env` rather than keeping
 their own copy, so there is one file to rotate.

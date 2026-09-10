@@ -13,6 +13,7 @@ import subprocess
 
 COMMAND = "pause"
 DESCRIPTION = "Pause Pi-hole blocking (e.g. /pause 10m, /pause off)"
+MIN_ROLE = "guest"
 
 DEFAULT_DURATION = "5m"
 # Pi-hole accepts a bare number (seconds) or a number with an s/m/h suffix.

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs system + Pi-hole updates, notifies via the Telegram bot, then reboots.
-# Triggered by: the existing Monday 3am cron job, AND on-demand via the
-# bot's /update confirm command.
+# Triggered by: the existing Monday 3am cron job, AND on-demand from the
+# bot's /update command (which confirms with a button before calling this).
 #
 # Secrets (BOT_TOKEN, ALLOWED_CHAT_ID) are read from the bot's .env so
 # there's a single place they're managed, instead of being duplicated here.
