@@ -5,6 +5,7 @@
 
 # Telegram bot credentials (BOT_TOKEN, ALLOWED_CHAT_ID)
 .env
+tokens.py
 
 # copyparty: password/filekey hashing salts and live login sessions.
 # Anyone with the salts can attack the account hashes offline; anyone with
