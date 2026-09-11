@@ -1,0 +1,19 @@
+[Unit]
+Description=Daily Pi-hole Teleporter backup
+
+[Timer]
+# 04:30 is deliberately after the Monday 03:00 auto_update.sh, which reboots the
+# Pi -- a backup scheduled during that window would be killed mid-commit.
+OnCalendar=*-*-* 04:30:00
+
+# Spread the wake-up a little; there is no reason for this to fire at exactly
+# the same second as everything else on the box.
+RandomizedDelaySec=30m
+
+# If the Pi was powered off at 04:30, run as soon as it is back rather than
+# skipping the day. A backup that silently does not happen is the failure mode
+# worth designing against.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

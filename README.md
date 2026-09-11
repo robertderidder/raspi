@@ -86,12 +86,14 @@ telegram-bot/
     pihole_pause.py         /pause 10m    pause blocking, self-expiring
     transmission.py         /transmission torrent progress
     update.py               /update       system update + reboot, confirm button
+    backup.py               /backup       Pi-hole config backup on demand
     access.py               /access       manage who can run what
   scripts/
     pihole_report.sh        the report /pihole formats and sends
     login_checker.sh        long-lived SSH watcher (login-checker.service)
     auto_update.sh          weekly apt + pihole update, then reboot (cron)
-    logs/                   append-only logs from the two above
+    pihole_backup.sh        daily config backup (pihole-backup.timer)
+    logs/                   append-only logs from the above
 ```
 
 `bot.py` scans `commands/` at startup, so adding a command is dropping in a file
@@ -127,8 +129,13 @@ their own copy, so there is one file to rotate.
 
 ## Timers, services and schedules
 
-Nothing here is a systemd timer — the recurring work is one cron job. The rest
-are long-lived services.
+Two kinds of recurring work: one cron job (the weekly update) and one systemd
+timer (the daily Pi-hole backup). The rest are long-lived services.
+
+New scheduled work should be a **timer, not cron**: the unit file is tracked in
+`system/` and comes back with the repo, whereas a crontab line lives only in the
+running machine's spool and has to be retyped by hand from `system/crontab.txt`
+after a rebuild.
 
 ### Enabled units that are mine
 
@@ -181,8 +188,22 @@ line means the ACL allowed it.
 ```
 
 Monday 03:00: `apt update && upgrade`, `pihole -up`, `pihole -g`, a Telegram
-notification, then reboot. Also reachable on demand as `/update` → `/update
-confirm`.
+notification, then reboot. Also reachable on demand as `/update`, which now
+confirms with a button rather than a typed `/update confirm`.
+
+### Config backup
+
+`pihole-backup.timer` runs `pihole_backup.sh` daily at 04:30 — after the Monday
+03:00 update, which reboots the box. It runs `pihole-FTL --teleporter`, puts the
+result in `pihole-backup/` with the password hash emptied, and commits and pushes.
+
+```bash
+systemctl list-timers pihole-backup.timer   # next and last run
+git log --oneline -- pihole-backup/         # is it still committing?
+```
+
+The second one is the check that matters — a timer can run happily for months
+while producing nothing.
 
 > This entry used to read `23 59 * * 1`. Cron's field order is
 > `minute hour dom month dow`, so that parsed as *minute 23 of hour 59* — an
@@ -337,8 +358,9 @@ python bot.py                            # test in the foreground first
 
 sudo cp ~/raspi/system/etc/systemd/system/telegram-bot.service /etc/systemd/system/
 sudo cp ~/raspi/system/etc/systemd/system/login-checker.service /etc/systemd/system/
+sudo cp ~/raspi/system/etc/systemd/system/pihole-backup.{service,timer} /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now telegram-bot login-checker
+sudo systemctl enable --now telegram-bot login-checker pihole-backup.timer
 crontab -e                               # see system/crontab.txt
 ```
 

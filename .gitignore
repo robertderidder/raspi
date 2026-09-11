@@ -12,6 +12,12 @@ tokens.py
 # the roommate's id is not ours to publish either way.
 telegram-bot/allowed_chats.json
 
+# A raw Teleporter archive still contains the unscrubbed pihole.toml. The backup
+# script unpacks and scrubs into pihole-backup/ and never leaves a .zip behind,
+# so one appearing here is a stray from a manual export -- keep it out.
+pihole-backup/*.zip
+*teleporter*.zip
+
 # copyparty: password/filekey hashing salts and live login sessions.
 # Anyone with the salts can attack the account hashes offline; anyone with
 # sessions.db can resume a logged-in session. copyparty.conf itself is fine

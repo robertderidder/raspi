@@ -1,0 +1,17 @@
+[Unit]
+Description=Pi-hole Teleporter backup into the raspi repo
+# Nothing to export if FTL never came up, and the push needs the network.
+After=network-online.target pihole-FTL.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=robert
+ExecStart=/home/robert/telegram-bot/scripts/pihole_backup.sh
+
+# The export needs sudo to read /etc/pihole, and the push needs the user's SSH
+# key -- so this runs as robert (who has passwordless sudo) rather than as root,
+# which would have no key and would leave root-owned files in the checkout.
+
+[Install]
+WantedBy=multi-user.target

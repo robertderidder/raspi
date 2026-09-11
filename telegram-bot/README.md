@@ -29,6 +29,7 @@ leaks, that check is what stops a stranger from querying your Pi.
 | `/pause [10m]` | guest | Pause Pi-hole blocking; `/pause off` to re-enable early |
 | `/transmission` | guest | Torrent progress from `transmission-remote` |
 | `/update` | admin | System + Pi-hole update, then reboot. Asks with a confirm button, live for 60 s |
+| `/backup` | admin | Run the Pi-hole config backup now; `/backup check` to dry-run it |
 | `/access` | **owner** | Add, remove and tune everyone else's permissions |
 
 ## Access control
@@ -94,6 +95,7 @@ scripts/
   pihole_report.sh      formats the /pihole report; prints HTML to stdout
   login_checker.sh      SSH login watcher, run by login-checker.service
   auto_update.sh        weekly apt + pihole update, run by cron and /update
+  pihole_backup.sh      daily config backup, run by pihole-backup.timer and /backup
   logs/                 append-only logs from the above, plus access.log
 ```
 
@@ -128,8 +130,9 @@ Then install the services. The unit files are tracked in the parent repo under
 ```bash
 sudo cp ~/raspi/system/etc/systemd/system/telegram-bot.service /etc/systemd/system/
 sudo cp ~/raspi/system/etc/systemd/system/login-checker.service /etc/systemd/system/
+sudo cp ~/raspi/system/etc/systemd/system/pihole-backup.{service,timer} /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now telegram-bot login-checker
+sudo systemctl enable --now telegram-bot login-checker pihole-backup.timer
 
 journalctl -u telegram-bot -f
 ```
