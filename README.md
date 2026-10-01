@@ -381,21 +381,24 @@ git clone https://github.com/waveshare/WM8960-Audio-HAT
 cd WM8960-Audio-HAT && sudo ./install.sh && sudo reboot
 
 sudo apt install -y pipewire pipewire-audio-client-libraries wireplumber libspa-0.2-bluetooth
-wpctl status                             # find the card id
-wpctl set-default <id>
 
 curl -sL https://dtcooper.github.io/raspotify/install.sh | sh
-
-sudo cp -r ~/raspi/system/etc/systemd/system/wm8960-soundcard.service.d /etc/systemd/system/
-sudo systemctl daemon-reload
 ```
 
-The headphone volume can't be saved with `alsactl store`. Waveshare's
-`wm8960-soundcard.service` deletes `/var/lib/alsa/asound.state` on every boot,
-re-links it to its own default state file, and restores from that. So the
-volume always comes back at 95%. The `volume.conf` drop-in sets Headphone to
-80% after that service has run. To change the level, edit the drop-in, not
-alsamixer.
+PipeWire must not manage the HAT. The card has no UCM profile, so WirePlumber
+falls back to a generic one and sets Headphone to 0 (mute) every time it
+starts, which is after the saved mixer state has been restored. So after each
+reboot the volume had to be set again by hand. The stowed
+`.config/wireplumber/main.lua.d/51-wm8960-disable.lua` hides the card from
+PipeWire. That loses nothing: raspotify plays to ALSA directly through
+Waveshare's `/etc/asound.conf`, and Bluetooth still goes through PipeWire.
+
+To change the level, use `alsamixer -c 0` (Headphone; 79 = 0 dB), then save
+it to the file that Waveshare's boot script restores from:
+
+```bash
+sudo alsactl store -f /etc/wm8960-soundcard/wm8960_asound.state
+```
 
 `sudo usermod -aG bluetooth robert` if you want to pair a speaker over
 `bluetoothctl`.
