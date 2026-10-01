@@ -385,7 +385,17 @@ wpctl status                             # find the card id
 wpctl set-default <id>
 
 curl -sL https://dtcooper.github.io/raspotify/install.sh | sh
+
+sudo cp -r ~/raspi/system/etc/systemd/system/wm8960-soundcard.service.d /etc/systemd/system/
+sudo systemctl daemon-reload
 ```
+
+The headphone volume can't be saved with `alsactl store`. Waveshare's
+`wm8960-soundcard.service` deletes `/var/lib/alsa/asound.state` on every boot,
+re-links it to its own default state file, and restores from that. So the
+volume always comes back at 95%. The `volume.conf` drop-in sets Headphone to
+80% after that service has run. To change the level, edit the drop-in, not
+alsamixer.
 
 `sudo usermod -aG bluetooth robert` if you want to pair a speaker over
 `bluetoothctl`.
