@@ -91,7 +91,7 @@ telegram-bot/
   scripts/
     pihole_report.sh        the report /pihole formats and sends
     login_checker.sh        long-lived SSH watcher (login-checker.service)
-    auto_update.sh          weekly apt + pihole update, then reboot (cron)
+    auto_update.sh          monthly apt + pihole update, then reboot (cron)
     pihole_backup.sh        daily config backup (pihole-backup.timer)
     logs/                   append-only logs from the above
 ```
@@ -129,7 +129,7 @@ their own copy, so there is one file to rotate.
 
 ## Timers, services and schedules
 
-Two kinds of recurring work: one cron job (the weekly update) and one systemd
+Two kinds of recurring work: one cron job (the monthly update) and one systemd
 timer (the daily Pi-hole backup). The rest are long-lived services.
 
 New scheduled work should be a **timer, not cron**: the unit file is tracked in
@@ -184,16 +184,16 @@ line means the ACL allowed it.
 ### Cron
 
 ```cron
-0 3 * * 1 /home/robert/telegram-bot/scripts/auto_update.sh
+0 3 1 * * /home/robert/telegram-bot/scripts/auto_update.sh
 ```
 
-Monday 03:00: `apt update && upgrade`, `pihole -up`, `pihole -g`, a Telegram
-notification, then reboot. Also reachable on demand as `/update`, which now
-confirms with a button rather than a typed `/update confirm`.
+The 1st of each month, 03:00: `apt update && upgrade`, `pihole -up`,
+`pihole -g`, a Telegram notification, then reboot. Also reachable on demand as
+`/update`, which now confirms with a button rather than a typed `/update confirm`.
 
 ### Config backup
 
-`pihole-backup.timer` runs `pihole_backup.sh` daily at 04:30 — after the Monday
+`pihole-backup.timer` runs `pihole_backup.sh` daily at 04:30 — after the monthly
 03:00 update, which reboots the box. It runs `pihole-FTL --teleporter`, puts the
 result in `pihole-backup/` with the password hash emptied, and commits and pushes.
 
@@ -208,7 +208,9 @@ while producing nothing.
 > This entry used to read `23 59 * * 1`. Cron's field order is
 > `minute hour dom month dow`, so that parsed as *minute 23 of hour 59* — an
 > hour that never happens. **The weekly update had never once run**; the only
-> entries in `auto_update.log` are manual invocations. Fixed to `0 3 * * 1`.
+> entries in `auto_update.log` are manual invocations. Fixed to `0 3 * * 1`,
+> and later changed on purpose to monthly, `0 3 1 * *`. The `1` is in the
+> day-of-month field, not day-of-week.
 
 ### Stock Debian timers
 

@@ -94,7 +94,7 @@ commands/               one file per command
 scripts/
   pihole_report.sh      formats the /pihole report; prints HTML to stdout
   login_checker.sh      SSH login watcher, run by login-checker.service
-  auto_update.sh        weekly apt + pihole update, run by cron and /update
+  auto_update.sh        monthly apt + pihole update, run by cron and /update
   pihole_backup.sh      daily config backup, run by pihole-backup.timer and /backup
   logs/                 append-only logs from the above, plus access.log
 ```

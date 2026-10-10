@@ -2,7 +2,7 @@
 Description=Daily Pi-hole Teleporter backup
 
 [Timer]
-# 04:30 is deliberately after the Monday 03:00 auto_update.sh, which reboots the
+# 04:30 is deliberately after the 03:00 auto_update.sh (1st of the month), which reboots the
 # Pi -- a backup scheduled during that window would be killed mid-commit.
 OnCalendar=*-*-* 04:30:00
 

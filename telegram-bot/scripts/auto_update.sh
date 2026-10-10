@@ -1,6 +1,6 @@
 #!/bin/bash
 # Runs system + Pi-hole updates, notifies via the Telegram bot, then reboots.
-# Triggered by: the existing Monday 3am cron job, AND on-demand from the
+# Triggered by: the monthly cron job (1st, 03:00), AND on-demand from the
 # bot's /update command (which confirms with a button before calling this).
 #
 # Secrets (BOT_TOKEN, ALLOWED_CHAT_ID) are read from the bot's .env so
@@ -45,7 +45,7 @@ mkdir -p "$LOGDIR"
 if [ -n "${BOT_TOKEN:-}" ] && [ -n "${ALLOWED_CHAT_ID:-}" ]; then
   curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
        -d "chat_id=${ALLOWED_CHAT_ID}" \
-       -d "text=✅ Weekly update completed successfully. Rebooting now." \
+       -d "text=✅ Monthly update completed successfully. Rebooting now." \
        > /dev/null
 fi
 
