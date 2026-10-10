@@ -35,6 +35,14 @@ pihole-backup/*.zip
 .config/transmission-daemon/dht.dat
 .config/transmission-daemon/*.bak-*
 
+# tinytuya: tinytuya.json holds the Tuya cloud apiKey/apiSecret, and the
+# device dumps hold each device's local_key -- enough to control the devices
+# on the LAN. Re-create them with `tinytuya wizard`.
+tuya/tinytuya.json
+tuya/devices.json
+tuya/tuya-raw.json
+tuya/snapshot.json
+
 # Keys and certificates of any kind
 *.key
 *.pem
