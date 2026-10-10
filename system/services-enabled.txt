@@ -34,3 +34,16 @@ unbound-resolvconf.service         enabled enabled
 unbound.service                    enabled enabled
 wm8960-soundcard.service           enabled enabled
 wpa_supplicant.service             enabled enabled
+avahi-daemon.socket                enabled enabled
+triggerhappy.socket                enabled enabled
+nfs-client.target                  enabled enabled
+remote-fs.target                   enabled enabled
+apt-daily-upgrade.timer            enabled enabled
+apt-daily.timer                    enabled enabled
+dpkg-db-backup.timer               enabled enabled
+e2scrub_all.timer                  enabled enabled
+fstrim.timer                       enabled enabled
+log2ram-daily.timer                enabled enabled
+logrotate.timer                    enabled enabled
+man-db.timer                       enabled enabled
+pihole-backup.timer                enabled enabled
