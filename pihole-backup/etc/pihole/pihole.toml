@@ -1,7 +1,7 @@
-# Pi-hole configuration file (v6.7)
+# Pi-hole configuration file (v6.7.1)
 # Encoding: UTF-8
 # This file is managed by pihole-FTL
-# Last updated on 2026-09-11 08:45:28 CEST
+# Last updated on 2026-10-10 20:29:49 CEST
 
 [dns]
   # Upstream DNS Servers to be used by Pi-hole. If this is not set, Pi-hole will not
@@ -280,7 +280,10 @@
   #    
   #     - "<domain>": Domain used for the reverse server feature (e.g., "fritz.box")
   #     Example: "fritz.box"
-  revServers = []
+  revServers = [
+    "true,192.168.0.0/24,192.168.0.1,tplinkwifi.net",
+    "true,100.0.0.0/8,100.66.228.36"
+  ] ### CHANGED, default = []
 
   [dns.domain]
     # The DNS domain used by your Pi-hole.
@@ -586,7 +589,7 @@
   #
   # Allowed values are:
   #     A valid IPv4 address, or empty string ("")
-  router = "192.168.178.1" ### CHANGED, default = ""
+  router = "192.168.0.1" ### CHANGED, default = ""
 
   # The netmask used by your Pi-hole. For directly connected networks (i.e., networks on
   # which the machine running Pi-hole has an interface) the netmask is optional and may
@@ -1005,19 +1008,22 @@
   # Additional options passed directly to the web server.
   #
   # This can be used to set any option supported by the underlying web server
-  # (CivetWeb). See the CivetWeb documentation for a list of supported options. The
-  # options are passed as an array of strings, where each string is an option in the
-  # form "<option>=<value>". Be aware that this is an advanced option and that setting
-  # options here may break the web server if invalid or conflicting with other settings
-  # applied based on other settings in this file. The config options specified here are
-  # added to the end of the passed options. This makes it possible to overwrite settings
-  # set by Pi-hole (only the last values is used when a config option is specified
-  # multiple times). Use with caution.
+  # (CivetWeb). The options are passed as an array of strings, where each string is an
+  # option in the form "<option>=<value>". The config options specified here are added
+  # to the end of the passed options. This makes it possible to overwrite settings set
+  # by Pi-hole (only the last value is used when a config option is specified multiple
+  # times). Use with caution: setting options here may break the web server if they
+  # conflict with other settings applied based on other settings in this file.
   #
-  # Example: [ "ssl_protocol_version=4", "ssl_cipher_list=AES128:!MD5" ]
+  # Options given here reach the web server unchecked, and some of them decide which
+  # files it serves or executes, so this option cannot be set through the API. Set it in
+  # /etc/pihole/pihole.toml, through an environment variable, or with "pihole-FTL
+  # --config" - all of which require access to the host.
+  #
+  # Example: [ "num_threads=8", "max_request_size=32768" ]
   #
   # Allowed values are:
-  #     An array of valid CivetWeb options
+  #     An array of permitted CivetWeb options
   advancedOpts = []
 
   [webserver.session]
@@ -1078,13 +1084,25 @@
     validity = 47
 
   [webserver.paths]
-    # Server root on the host
+    # Server root on the host.
+    #
+    # Every file below this directory can be requested over the network once
+    # webserver.serve_all is enabled, so it cannot be "/" or any other directory
+    # containing "/etc/pihole".
+    #
+    # Relocating the document root decides which files the web server serves, so it cannot
+    # be set through the API. Set it in /etc/pihole/pihole.toml, through an environment
+    # variable, or with "pihole-FTL --config" - all of which require access to the host.
     #
     # Allowed values are:
-    #     A valid path
+    #     A valid absolute path not containing "/etc/pihole"
     webroot = "/var/www/html"
 
     # Sub-directory of the root containing the web interface
+    #
+    # This decides where the web server serves the interface from, so it cannot be set
+    # through the API. Set it in /etc/pihole/pihole.toml, through an environment variable,
+    # or with "pihole-FTL --config" - all of which require access to the host.
     #
     # Allowed values are:
     #     A valid subpath, both slashes are needed!
@@ -1102,6 +1120,10 @@
     # empty. Setting this field to an incorrect value may result in the web interface not
     # being accessible.
     # Don't use this setting if you are not using a reverse proxy!
+    #
+    # This decides where the web server serves the interface from, so it cannot be set
+    # through the API. Set it in /etc/pihole/pihole.toml, through an environment variable,
+    # or with "pihole-FTL --config" - all of which require access to the host.
     #
     # Allowed values are:
     #     A valid URL prefix or empty
@@ -1416,6 +1438,12 @@
   # from working.
   #
   # Use this option with extra care.
+  #
+  # dnsmasq directives such as "dhcp-script" and "conf-script" name programs that
+  # dnsmasq then executes, so this option cannot be set through the API. Set it in
+  # /etc/pihole/pihole.toml, through an environment variable, or with "pihole-FTL
+  # --config" - all of which require access to the host, which anyone placing such a
+  # script has anyway.
   #
   # Example: [ "address=/example.com/192.168.0.1", "address=/example.org/192.168.0.2",
   # "address=/example.net/192.168.0.3" ]
@@ -1747,6 +1775,6 @@
   all = false
 
 # Configuration statistics:
-# 167 total entries out of which 159 entries are default
-# --> 8 entries are modified
+# 167 total entries out of which 158 entries are default
+# --> 9 entries are modified
 
